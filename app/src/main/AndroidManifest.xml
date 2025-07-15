@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="NewsFest"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NewsFest"
-        tools:targetApi="31">
+        android:theme="@style/Theme.C36B"
+        tools:targetApi="31"
+        tools:replace="android:fullBackupContent">
         <activity
-            android:name=".View.LoginActivity"
-            android:exported="false"
-            android:label="@string/title_activity_login"
-            android:theme="@style/Theme.NewsFest" />
-        <activity
-            android:name=".View.SplashActivity"
+            android:name=".view.NavigationActivity"
             android:exported="true"
-            android:label="@string/title_activity_splash"
-            android:theme="@style/Theme.NewsFest">
+            android:label="@string/title_activity_navigation"
+            android:theme="@style/Theme.C36B">
+
+        </activity>
+        <activity
+            android:name=".view.SplashActivity"
+            android:exported="true"
+            android:label="NewsFest"
+            android:theme="@style/Theme.C36B">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,10 +35,24 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".view.RegistrationActivity"
+            android:exported="true"
+            android:label="@string/title_activity_registration"
+            android:theme="@style/Theme.C36B">
+
+        </activity>
+        <activity
+            android:name=".view.LoginActivity"
+            android:exported="true"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.C36B">
+
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.NewsFest">
+            android:theme="@style/Theme.C36B">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

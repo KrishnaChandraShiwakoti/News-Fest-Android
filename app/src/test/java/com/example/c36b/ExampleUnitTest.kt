@@ -1,4 +1,4 @@
-package com.example.newsfest
+package com.example.c36b
 
 import org.junit.Test
 
