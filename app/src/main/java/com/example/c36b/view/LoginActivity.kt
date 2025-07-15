@@ -51,6 +51,8 @@ import com.example.c36b.repository.UserRepositoryImpl
 import com.example.c36b.ui.theme.C36BTheme
 import com.example.c36b.viewmodel.UserViewModel
 import com.example.c36b.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 
 class LoginActivity : ComponentActivity() {
@@ -161,9 +163,26 @@ fun loginBody(){
                     OutlinedButton(onClick = {
                         userViewModel.login  (email,password){ success,message->
                             if(success){
-                                val intent = Intent(context, NavigationActivity::class.java)
-                                context.startActivity(intent)
-                                activity?.finish()
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                if(userId != null){
+                                    val databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId)
+                                    databaseRef.get().addOnSuccessListener { dataSnapshot->
+                                        val role = dataSnapshot.child("role").getValue(String::class.java)
+                                        if(role!=null){
+                                            if(role == "admin"){
+                                                val intent = Intent(context,
+                                                    AdminNavigationActivity::class.java)
+                                                context.startActivity(intent)
+                                            }else{
+                                                val intent = Intent(context, NavigationActivity::class.java)
+                                                context.startActivity(intent)
+                                            }
+                                            activity?.finish()
+                                        }else{
+                                            Toast.makeText(context,"Role not Found",Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
                             }else{
                                 Toast.makeText(context,message,Toast.LENGTH_LONG).show()
                             }
@@ -201,5 +220,13 @@ fun loginBody(){
             }
         }
 
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun loginPreview(){
+    com.example.c36b.view.pages.ui.theme.C36BTheme {
+        loginBody()
     }
 }

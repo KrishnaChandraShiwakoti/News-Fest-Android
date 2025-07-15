@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -14,15 +15,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.C36B"
-        tools:targetApi="31"
-        tools:replace="android:fullBackupContent">
+        tools:replace="android:fullBackupContent"
+        tools:targetApi="31">
+        <activity
+            android:name=".view.AdminNavigationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_admin_navigation"
+            android:theme="@style/Theme.C36B" />
+        <activity
+            android:name=".view.pages.CategoriesActivity"
+            android:exported="false"
+            android:label="@string/title_activity_categories"
+            android:theme="@style/Theme.C36B" />
         <activity
             android:name=".view.NavigationActivity"
             android:exported="true"
             android:label="@string/title_activity_navigation"
-            android:theme="@style/Theme.C36B">
-
-        </activity>
+            android:theme="@style/Theme.C36B" />
         <activity
             android:name=".view.SplashActivity"
             android:exported="true"
@@ -38,16 +47,12 @@
             android:name=".view.RegistrationActivity"
             android:exported="true"
             android:label="@string/title_activity_registration"
-            android:theme="@style/Theme.C36B">
-
-        </activity>
+            android:theme="@style/Theme.C36B" />
         <activity
             android:name=".view.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
-            android:theme="@style/Theme.C36B">
-
-        </activity>
+            android:theme="@style/Theme.C36B" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

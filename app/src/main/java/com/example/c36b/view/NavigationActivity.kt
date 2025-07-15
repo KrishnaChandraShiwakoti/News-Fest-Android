@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -31,9 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.c36b.view.pages.HomeScreen
-import com.example.c36b.view.pages.NotificationScreen
 import com.example.c36b.view.pages.ProfileScreen
 import com.example.c36b.view.pages.SearchScreen
+import com.example.c36b.view.pages.BookmarkScreen
+import com.example.c36b.R
+import com.example.c36b.view.pages.CategoriesScreen
+
 
 class NavigationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,43 +56,21 @@ fun NavigationBody() {
 
     val bottomNavItems = listOf(
         BottomNavItem("Home", Icons.Default.Home),
+        BottomNavItem("Categories", Icons.Default.DateRange),
         BottomNavItem("Search", Icons.Default.Search),
-        BottomNavItem("Notification", Icons.Default.Notifications),
+        BottomNavItem("Bookmark", Icons.Default.FavoriteBorder),
         BottomNavItem("Profile", Icons.Default.Person)
     )
 
     var selectedIndex by remember { mutableStateOf(0) }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-//                navigationIcon = {
-//                    IconButton(onClick = {
-//
-//                    }) {
-//                        Icon(Icons.Default.KeyboardArrowLeft,contentDescription = null)
-//                    }
-//                },
-                title = {
-                    Text("Ecommerce")
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.FavoriteBorder,contentDescription = null)
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Search,contentDescription = null)
-                    }
-                }
-            )
-        },
         bottomBar = {
             NavigationBar {
                 bottomNavItems.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = { Icon(item.icon,
                             contentDescription = item.label) },
-                        label = { Text(item.label) },
                         selected = selectedIndex == index,
                         onClick = { selectedIndex = index }
                     )
@@ -104,9 +86,10 @@ fun NavigationBody() {
         ) {
             when (selectedIndex) {
                 0 -> HomeScreen()
-                1 -> SearchScreen()
-                2 -> NotificationScreen()
-                3 -> ProfileScreen()
+                1-> CategoriesScreen()
+                2 -> SearchScreen()
+                3 -> BookmarkScreen()
+                4 -> ProfileScreen()
             }
         }
     }
