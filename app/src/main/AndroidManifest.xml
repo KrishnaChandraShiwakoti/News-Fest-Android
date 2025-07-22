@@ -18,6 +18,26 @@
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
         <activity
+            android:name=".view.pages.Admin.CreateNewsScreen"
+            android:exported="false"
+            android:label="@string/title_activity_create_news_screen"
+            android:theme="@style/Theme.C36B" />
+        <activity
+            android:name=".view.pages.Admin.NewsScreen"
+            android:exported="false"
+            android:label="@string/title_activity_news_screen"
+            android:theme="@style/Theme.C36B" />
+        <activity
+            android:name=".view.pages.Admin.ProfileScreen"
+            android:exported="false"
+            android:label="@string/title_activity_profile_screen"
+            android:theme="@style/Theme.C36B" />
+        <activity
+            android:name=".view.pages.Admin.HomeScreen"
+            android:exported="false"
+            android:label="@string/title_activity_home_screen"
+            android:theme="@style/Theme.C36B" />
+        <activity
             android:name=".view.AdminNavigationActivity"
             android:exported="false"
             android:label="@string/title_activity_admin_navigation"
