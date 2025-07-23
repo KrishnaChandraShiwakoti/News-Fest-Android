@@ -1,13 +1,15 @@
 package com.example.c36b.model
 
+import android.net.Uri
+
 data class Post(
     val username: String,
-    val handle: String,
     val time: String,
     val content: String,
     val tags: List<String>,
     val likes: Int,
     val comments: Int,
     val shares: Int,
-    val imageRes: Int
+    val imageUrl: String? = null,
+    val imageUri: Uri? = null
 )

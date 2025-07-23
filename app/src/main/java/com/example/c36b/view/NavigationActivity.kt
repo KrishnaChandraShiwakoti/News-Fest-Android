@@ -40,7 +40,6 @@ import com.example.c36b.view.pages.ProfileScreen
 import com.example.c36b.view.pages.SearchScreen
 import com.example.c36b.view.pages.BookmarkScreen
 import com.example.c36b.R
-import com.example.c36b.view.pages.CategoriesScreen
 import com.example.c36b.view.pages.CreateNewPost
 
 

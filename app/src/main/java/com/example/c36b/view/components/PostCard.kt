@@ -32,6 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.c36b.model.Post
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun PostCard(post: Post) {
@@ -46,7 +48,6 @@ fun PostCard(post: Post) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(text = post.username, fontWeight = FontWeight.Bold)
-                    Text(text = "@${post.handle} · ${post.time}", color = Color.Gray, fontSize = 12.sp)
                 }
             }
 
@@ -55,8 +56,9 @@ fun PostCard(post: Post) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Use AsyncImagePainter for imageUrl (String)
             Image(
-                painter = painterResource(id = post.imageRes),
+                painter = rememberAsyncImagePainter(post.imageUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()

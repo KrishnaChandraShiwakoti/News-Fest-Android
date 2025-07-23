@@ -75,6 +75,7 @@ fun loginBody(){
     val activity = context as? Activity
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
     Scaffold {
             innerPadding->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -162,34 +163,35 @@ fun loginBody(){
                         }
                     )
                     Spacer(modifier = Modifier.height(30.dp))
-                    OutlinedButton(onClick = {
-                        // Firebase login logic
-                        val auth = FirebaseAuth.getInstance()
-                        auth.signInWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    // Save login flag to SharedPreferences
-                                    val sharedPreferences = context.getSharedPreferences("User", android.content.Context.MODE_PRIVATE)
-                                    sharedPreferences.edit().apply {
-                                        putBoolean("isLoggedIn", true)
-                                        apply()
+                    OutlinedButton(
+                        onClick = {
+                            isLoading = true
+                            // Firebase login logic
+                            val auth = FirebaseAuth.getInstance()
+                            auth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener { task ->
+                                    isLoading = false
+                                    if (task.isSuccessful) {
+                                        // Save login flag to SharedPreferences
+                                        val sharedPreferences = context.getSharedPreferences("User", android.content.Context.MODE_PRIVATE)
+                                        sharedPreferences.edit().apply {
+                                            putBoolean("isLoggedIn", true)
+                                            apply()
+                                        }
+                                        // Navigate to main screen
+                                        val intent = Intent(context, NavigationActivity::class.java)
+                                        context.startActivity(intent)
+                                        activity?.finish()
+                                    } else {
+                                        Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                                     }
-                                    // Navigate to main screen
-                                    val intent = Intent(context, NavigationActivity::class.java)
-                                    context.startActivity(intent)
-                                    activity?.finish()
-                                } else {
-                                    Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                                 }
-                            }
-                    },
+                        },
                         modifier = Modifier.height(50.dp).width(200.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.LightGray,
-                            contentColor = Color.Black
-                        )
+                        colors = if (isLoading) ButtonDefaults.buttonColors(containerColor = Color.Gray, contentColor = Color.White)
+                                 else ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.Black)
                     ) {
-                        Text(text = "Login")
+                        Text(text = if (isLoading) "Logging in..." else "Login")
                     }
                     Spacer(modifier = Modifier.height(30.dp))
                     Text(

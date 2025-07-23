@@ -16,9 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://cloudinary.bintray.com/maven") }
     }
 }
 
 rootProject.name = "C36B"
 include(":app")
- 

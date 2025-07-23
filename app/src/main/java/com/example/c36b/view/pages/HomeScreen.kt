@@ -12,22 +12,47 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.c36b.R
+import com.example.c36b.view.components.PostCard
+import com.example.c36b.view.components.SearchBar
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.c36b.R
-import com.example.c36b.view.components.Post
-import com.example.c36b.view.components.PostCard
-import com.example.c36b.view.components.SearchBar
-import androidx.compose.foundation.lazy.items
+import com.example.c36b.model.Post
+import com.example.c36b.repository.PostRepositoryImpl
+import com.example.c36b.viewmodel.PostViewModel
 
 @Composable
 fun HomeScreen() {
+    val postViewModel: PostViewModel = viewModel(factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+            return PostViewModel(PostRepositoryImpl()) as T
+        }
+    })
+    var posts by remember { mutableStateOf<List<Post>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        postViewModel.getAllPosts { result, err ->
+            if (result != null) {
+                posts = result
+                isLoading = false
+            } else {
+                error = err
+                isLoading = false
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,10 +80,20 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn {
-            items(dummyPosts) { post ->
-                PostCard(post)
-                Spacer(modifier = Modifier.height(16.dp))
+        when {
+            isLoading -> {
+                Text("Loading posts...")
+            }
+            error != null -> {
+                Text("Error: $error")
+            }
+            else -> {
+                LazyColumn {
+                    items(posts) { post ->
+                        PostCard(post)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
             }
         }
     }
@@ -81,39 +116,3 @@ fun FilterChips() {
         }
     }
 }
-
-val dummyPosts = listOf(
-    Post(
-        username = "Sarah Chen",
-        handle = "sarahc",
-        time = "2h",
-        content = "Just finished reading an amazing book about mindfulness and productivity...",
-        tags = listOf("mindfulness", "productivity", "reading"),
-        likes = 124,
-        comments = 18,
-        shares = 1,
-        imageRes = R.drawable.ic_launcher_background // Use an actual drawable
-    ),
-            Post(
-            username = "Sarah Chen",
-    handle = "sarahc",
-    time = "2h",
-    content = "Just finished reading an amazing book about mindfulness and productivity...",
-    tags = listOf("mindfulness", "productivity", "reading"),
-    likes = 124,
-    comments = 18,
-    shares = 1,
-    imageRes = R.drawable.ic_launcher_background // Use an actual drawable
-),
-    Post(
-        username = "Sarah Chen",
-handle = "sarahc",
-time = "2h",
-content = "Just finished reading an amazing book about mindfulness and productivity...",
-tags = listOf("mindfulness", "productivity", "reading"),
-likes = 124,
-comments = 18,
-shares = 1,
-imageRes = R.drawable.ic_launcher_background // Use an actual drawable
-)
-)
