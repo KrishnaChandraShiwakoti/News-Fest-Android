@@ -12,32 +12,31 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.c36b.R
-import com.example.c36b.view.components.PostCard
-import com.example.c36b.view.components.SearchBar
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.c36b.R
+import com.example.c36b.view.components.PostCard
+import com.example.c36b.view.components.SearchBar
+import androidx.compose.foundation.lazy.items
 import com.example.c36b.model.Post
-import com.example.c36b.repository.PostRepositoryImpl
-import com.example.c36b.viewmodel.PostViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun HomeScreen() {
-    val postViewModel: PostViewModel = viewModel(factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+
+    // Fetch posts from Firebase
+    val postViewModel: com.example.c36b.viewmodel.PostViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = object : androidx.lifecycle.ViewModelProvider.Factory {
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-            return PostViewModel(PostRepositoryImpl()) as T
+            return com.example.c36b.viewmodel.PostViewModel(com.example.c36b.repository.PostRepositoryImpl()) as T
         }
     })
-    var posts by remember { mutableStateOf<List<Post>>(emptyList()) }
+    var posts by remember { mutableStateOf<List<com.example.c36b.model.Post>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -52,7 +51,6 @@ fun HomeScreen() {
             }
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,13 +77,12 @@ fun HomeScreen() {
         FilterChips()
 
         Spacer(modifier = Modifier.height(12.dp))
-
         when {
             isLoading -> {
-                Text("Loading posts...")
+                androidx.compose.material3.Text("Loading posts...")
             }
             error != null -> {
-                Text("Error: $error")
+                androidx.compose.material3.Text("Error: $error")
             }
             else -> {
                 LazyColumn {

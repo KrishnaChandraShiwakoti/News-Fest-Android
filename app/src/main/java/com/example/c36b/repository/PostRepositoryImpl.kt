@@ -131,13 +131,43 @@ class PostRepositoryImpl : PostRepository {
     }
 
     override fun getPostsByUser(username: String, callback: (List<Post>?, String?) -> Unit) {
-        // TODO: Implement fetching posts by user
-        callback(emptyList(), null)
+        ref.orderByChild("username").equalTo(username).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val posts = mutableListOf<Post>()
+                val snapshot = task.result
+                if (snapshot != null && snapshot.exists()) {
+                    for (child in snapshot.children) {
+                        val post = child.getValue(Post::class.java)
+                        if (post != null) {
+                            posts.add(post)
+                        }
+                    }
+                }
+                callback(posts, null)
+            } else {
+                callback(null, task.exception?.message ?: "Failed to fetch posts by user")
+            }
+        }
     }
 
     override fun getPostsByTag(tag: String, callback: (List<Post>?, String?) -> Unit) {
-        // TODO: Implement fetching posts by tag
-        callback(emptyList(), null)
+        ref.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val posts = mutableListOf<Post>()
+                val snapshot = task.result
+                if (snapshot != null && snapshot.exists()) {
+                    for (child in snapshot.children) {
+                        val post = child.getValue(Post::class.java)
+                        if (post != null && post.tags.contains(tag)) {
+                            posts.add(post)
+                        }
+                    }
+                }
+                callback(posts, null)
+            } else {
+                callback(null, task.exception?.message ?: "Failed to fetch posts by tag")
+            }
+        }
     }
 
     fun uploadImageToCloudinary(
