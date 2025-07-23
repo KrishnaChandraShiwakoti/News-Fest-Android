@@ -23,7 +23,7 @@
             android:label="@string/title_activity_create_news_screen"
             android:theme="@style/Theme.C36B" />
         <activity
-            android:name=".view.pages.Admin.NewsScreen"
+            android:name=".view.pages.NewsScreen"
             android:exported="false"
             android:label="@string/title_activity_news_screen"
             android:theme="@style/Theme.C36B" />
@@ -41,11 +41,6 @@
             android:name=".view.AdminNavigationActivity"
             android:exported="false"
             android:label="@string/title_activity_admin_navigation"
-            android:theme="@style/Theme.C36B" />
-        <activity
-            android:name=".view.pages.CategoriesActivity"
-            android:exported="false"
-            android:label="@string/title_activity_categories"
             android:theme="@style/Theme.C36B" />
         <activity
             android:name=".view.NavigationActivity"

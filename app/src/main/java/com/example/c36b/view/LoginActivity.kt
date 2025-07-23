@@ -163,32 +163,25 @@ fun loginBody(){
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     OutlinedButton(onClick = {
-                        userViewModel.login  (email,password){ success,message->
-                            if(success){
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                if(userId != null){
-                                    val databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId)
-                                    databaseRef.get().addOnSuccessListener { dataSnapshot->
-                                        val role = dataSnapshot.child("role").getValue(String::class.java)
-                                        if(role!=null){
-                                            if(role == "admin"){
-                                                val intent = Intent(context,
-                                                    AdminNavigationActivity::class.java)
-                                                context.startActivity(intent)
-                                            }else{
-                                                val intent = Intent(context, NavigationActivity::class.java)
-                                                context.startActivity(intent)
-                                            }
-                                            activity?.finish()
-                                        }else{
-                                            Toast.makeText(context,"Role not Found",Toast.LENGTH_LONG).show()
-                                        }
+                        // Firebase login logic
+                        val auth = FirebaseAuth.getInstance()
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    // Save login flag to SharedPreferences
+                                    val sharedPreferences = context.getSharedPreferences("User", android.content.Context.MODE_PRIVATE)
+                                    sharedPreferences.edit().apply {
+                                        putBoolean("isLoggedIn", true)
+                                        apply()
                                     }
+                                    // Navigate to main screen
+                                    val intent = Intent(context, NavigationActivity::class.java)
+                                    context.startActivity(intent)
+                                    activity?.finish()
+                                } else {
+                                    Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                                 }
-                            }else{
-                                Toast.makeText(context,message,Toast.LENGTH_LONG).show()
                             }
-                        }
                     },
                         modifier = Modifier.height(50.dp).width(200.dp),
                         colors = ButtonDefaults.buttonColors(

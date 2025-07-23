@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
@@ -40,6 +41,7 @@ import com.example.c36b.view.pages.SearchScreen
 import com.example.c36b.view.pages.BookmarkScreen
 import com.example.c36b.R
 import com.example.c36b.view.pages.CategoriesScreen
+import com.example.c36b.view.pages.CreateNewPost
 
 
 class NavigationActivity : ComponentActivity() {
@@ -59,8 +61,8 @@ fun NavigationBody() {
 
     val bottomNavItems = listOf(
         BottomNavItem("Home", Icons.Default.Home),
-        BottomNavItem("Categories", Icons.Default.DateRange),
         BottomNavItem("Search", Icons.Default.Search),
+        BottomNavItem("create", Icons.Default.Create),
         BottomNavItem("Bookmark", Icons.Default.FavoriteBorder),
         BottomNavItem("Profile", Icons.Default.Person)
     )
@@ -89,8 +91,8 @@ fun NavigationBody() {
         ) {
             when (selectedIndex) {
                 0 -> HomeScreen()
-                1-> CategoriesScreen()
-                2 -> SearchScreen()
+                1 -> SearchScreen()
+                2-> CreateNewPost()
                 3 -> BookmarkScreen()
                 4 -> ProfileScreen()
             }

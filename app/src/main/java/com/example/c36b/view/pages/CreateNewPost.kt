@@ -1,6 +1,5 @@
-package com.example.c36b.view.pages.Admin
+package com.example.c36b.view.pages
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -10,11 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
@@ -32,10 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.c36b.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -103,38 +98,98 @@ Text(text = "Content", style = MaterialTheme.typography.labelMedium)
         OutlinedTextField(
             value = content,
             onValueChange = { content = it },
-            placeholder = { Text("Start writing your article...") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
+            placeholder = { Text("Write your article content here...") },
+            modifier = Modifier.fillMaxWidth().height(120.dp),
             shape = RoundedCornerShape(12.dp),
-            maxLines = 10
+            maxLines = 6
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Action Buttons
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            OutlinedButton (
-                onClick = { /* Save Draft logic */ },
-                modifier = Modifier.weight(1f)
-            ) {
-                Image(painter = painterResource(R.drawable.outline_article_24), contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Save Draft")
-            }
+        // Username Field
+        Text(text = "Author Name", style = MaterialTheme.typography.labelMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        var username by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            placeholder = { Text("Enter your name...") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
 
-            Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = { /* Publish logic */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(Icons.Default.Create, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Publish")
-            }
+        // Handle Field
+        Text(text = "Handle", style = MaterialTheme.typography.labelMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        var handle by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = handle,
+            onValueChange = { handle = it },
+            placeholder = { Text("Enter your handle (e.g. johndoe)") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Tags Field
+        Text(text = "Tags (comma separated)", style = MaterialTheme.typography.labelMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        var tags by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = tags,
+            onValueChange = { tags = it },
+            placeholder = { Text("e.g. news, world, trending") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Likes, Comments, Shares (optional, can be set to 0 by default)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            var likes by remember { mutableStateOf(0) }
+            var comments by remember { mutableStateOf(0) }
+            var shares by remember { mutableStateOf(0) }
+            OutlinedTextField(
+                value = likes.toString(),
+                onValueChange = { likes = it.toIntOrNull() ?: 0 },
+                label = { Text("Likes") },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            OutlinedTextField(
+                value = comments.toString(),
+                onValueChange = { comments = it.toIntOrNull() ?: 0 },
+                label = { Text("Comments") },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            OutlinedTextField(
+                value = shares.toString(),
+                onValueChange = { shares = it.toIntOrNull() ?: 0 },
+                label = { Text("Shares") },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Image Picker (already present above as Add Image)
+        // You can add logic to display the selected image if needed
+
+        // Submit Button
+        Button(
+            onClick = {
+                // TODO: Handle post creation logic here
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+        ) {
+            Text("Publish Article", color = Color.White)
         }
     }
 }

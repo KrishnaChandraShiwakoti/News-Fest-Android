@@ -1,4 +1,4 @@
-package com.example.c36b.view.pages.Admin
+package com.example.c36b.view.pages
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.c36b.view.pages.Admin.ui.theme.C36BTheme
+import com.example.c36b.view.pages.ui.theme.C36BTheme
 
 class NewsScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

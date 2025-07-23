@@ -47,26 +47,19 @@ fun SplashBody() {
 
     val sharedPreferences = context.getSharedPreferences("User",
         Context.MODE_PRIVATE)
-
-    val localEmail : String? = sharedPreferences.getString("email","")
-    val localPassword : String? = sharedPreferences.getString("password","")
-
-
+    val isLoggedIn: Boolean = sharedPreferences.getBoolean("isLoggedIn", false)
 
     LaunchedEffect(Unit) {
         delay(3000)
-        if(localEmail.toString().isEmpty()){
+        if(!isLoggedIn){
             val intent = Intent(context, LoginActivity::class.java)
             context.startActivity(intent)
             activity.finish()
-        }else{
-            val intent = Intent(context, NavigationActivity::class.java)
+        } else {
+            val intent = Intent(context, LoginActivity::class.java)
             context.startActivity(intent)
             activity.finish()
         }
-
-
-
     }
     Scaffold { innerPadding ->
         Column(modifier = Modifier
