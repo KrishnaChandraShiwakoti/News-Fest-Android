@@ -1,10 +1,20 @@
 package com.example.c36b.view.pages
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -15,31 +25,34 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.c36b.model.UserModel
 import com.example.c36b.model.Post
+import com.example.c36b.model.UserModel
 import com.example.c36b.repository.PostRepositoryImpl
 import com.example.c36b.viewmodel.PostViewModel
-import com.example.c36b.view.components.PostCard
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 
 @Composable
-fun ProfileScreen(
+fun UserScreen(
     user: UserModel,
-    onEditProfile: () -> Unit,
-    onSettings: () -> Unit,
-    onCreatePost: () -> Unit,
-    onPostClick: (Post) -> Unit
-) {
+    onPostClick: (Post) -> Unit,
+    onFollowClick: () -> Unit,
+){
     val postViewModel: PostViewModel = viewModel(factory = object : androidx.lifecycle.ViewModelProvider.Factory {
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
             return PostViewModel(PostRepositoryImpl()) as T
@@ -68,26 +81,6 @@ fun ProfileScreen(
             .padding(16.dp)
     )
     {
-        // Top bar
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        )
-        {
-            Text(
-                text = "Profile",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Settings",
-                modifier = Modifier
-                    .size(28.dp)
-                    .clickable { onSettings() }
-            )
-        }
         Spacer(modifier = Modifier.height(24.dp))
         // Profile picture
         Box(
@@ -145,12 +138,12 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
         // Edit Profile button
         Button(
-            onClick = onEditProfile,
+            onClick = onFollowClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
-            Text("Edit Profile")
+            Text("Follow")
         }
         Spacer(modifier = Modifier.height(24.dp))
         // User's posts
@@ -162,31 +155,28 @@ fun ProfileScreen(
                 Text("Error: $error", color = Color.Red, modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             posts.isEmpty() -> {
-                Button(
-                    onClick = onCreatePost,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text("Create Post")
-                }
+                Text("No posts available", modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             else -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp)) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(4.dp)
+                ) {
                     items(posts) { post ->
-                        Box(modifier = Modifier
-                            .padding(4.dp)
-                            .clip(MaterialTheme.shapes.medium)
-                            .clickable { onPostClick(post) }
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .clickable { onPostClick(post) }
                         ) {
-                            if (post.imageUrl != null) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(post.imageUrl),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxWidth().height(100.dp),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(100.dp))
-                            }
+                            Image(
+                                painter = rememberAsyncImagePainter(post.imageUrl),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .clip(MaterialTheme.shapes.small),
+                                contentScale = ContentScale.Crop
+                            )
                         }
                     }
                 }
@@ -195,10 +185,4 @@ fun ProfileScreen(
     }
 }
 
-@Composable
-fun StatItem(count: Int, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = count.toString(), fontWeight = FontWeight.Bold)
-        Text(text = label, color = Color.Gray)
-    }
-}
+

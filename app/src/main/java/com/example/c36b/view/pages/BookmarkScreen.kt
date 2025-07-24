@@ -26,7 +26,11 @@ fun BookmarkScreen(bookmarkedPosts: List<Post> = emptyList()) {
         } else {
             LazyColumn {
                 items(bookmarkedPosts) { post ->
-                    PostCard(post)
+                    PostCard(
+                        post = post,
+                        onLike = { /* TODO: Implement like functionality for bookmarks */ },
+                        onComment = { /* TODO: Implement comment modal for bookmarks */ }
+                    )
                 }
             }
         }

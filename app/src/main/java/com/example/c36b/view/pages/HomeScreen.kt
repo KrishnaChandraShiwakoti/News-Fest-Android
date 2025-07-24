@@ -39,6 +39,7 @@ fun HomeScreen() {
     var posts by remember { mutableStateOf<List<com.example.c36b.model.Post>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+    var showComments by remember { mutableStateOf<Post?>(null) }
 
     LaunchedEffect(Unit) {
         postViewModel.getAllPosts { result, err ->
@@ -69,14 +70,6 @@ fun HomeScreen() {
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        SearchBar()
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        FilterChips()
-
-        Spacer(modifier = Modifier.height(12.dp))
         when {
             isLoading -> {
                 androidx.compose.material3.Text("Loading posts...")
@@ -87,29 +80,57 @@ fun HomeScreen() {
             else -> {
                 LazyColumn {
                     items(posts) { post ->
-                        PostCard(post)
+                        val currentUserId = com.example.c36b.repository.UserRepositoryImpl().getCurrentUser()?.uid ?: ""
+                        var liked by remember { mutableStateOf(post.likedBy.contains(currentUserId)) }
+                        var likeCount by remember { mutableStateOf(post.likes) }
+                        PostCard(
+                            post = post.copy(likes = likeCount),
+                            onLike = {
+                                if (!liked && post.key != null) {
+                                    liked = true
+                                    likeCount++
+                                    postViewModel.addLike(postId = post.key!!, userId = currentUserId) { success, _ ->
+                                        if (success) {
+                                            postViewModel.getAllPosts { result, err ->
+                                                if (result != null) posts = result
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            onComment = { showComments = post },
+                            liked = liked
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun FilterChips() {
-    val categories = listOf("All", "Technology", "Lifestyle", "Travel", "Food")
-    var selected by remember { mutableStateOf("All") }
-
-    LazyRow {
-        items(categories.size) { index ->
-            val category = categories[index]
-            FilterChip(
-                selected = selected == category,
-                onClick = { selected = category },
-                label = { Text(category) },
-                modifier = Modifier.padding(end = 8.dp)
-            )
-        }
+    if (showComments != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showComments = null },
+            confirmButton = {},
+            text = {
+                com.example.c36b.view.components.CommentPage(
+                    comments = showComments!!.comments,
+                    onSubmit = { comment ->
+                        if (comment == "__close__") {
+                            showComments = null
+                        } else {
+                            val currentUserId = com.example.c36b.repository.UserRepositoryImpl().getCurrentUser()?.uid ?: ""
+                            postViewModel.addComment(showComments!!.key!!, comment, currentUserId) { success, _ ->
+                                if (success) {
+                                    postViewModel.getAllPosts { result, _ ->
+                                        if (result != null) posts = result
+                                    }
+                                }
+                            }
+                        }
+                        showComments = null
+                    }
+                )
+            }
+        )
     }
 }

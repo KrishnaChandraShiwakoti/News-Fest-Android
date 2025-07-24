@@ -60,8 +60,9 @@ class PostRepositoryImpl : PostRepository {
                 if (snapshot != null && snapshot.exists()) {
                     for (child in snapshot.children) {
                         val post = child.getValue(Post::class.java)
+                        val key = child.key
                         if (post != null) {
-                            posts.add(post)
+                            posts.add(post.copy(key = key))
                         }
                     }
                 }
@@ -220,5 +221,57 @@ class PostRepositoryImpl : PostRepository {
             }
         }
         return fileName
+    }
+
+
+    override fun addLike(postId: String, userId: String, callback: (Boolean, String) -> Unit) {
+        val postRef = ref.child(postId)
+        postRef.get().addOnSuccessListener { snapshot ->
+            val post = snapshot.getValue(Post::class.java)
+            if (post != null) {
+                if (!post.likedBy.contains(userId)) {
+                    val updatedLikes = post.likes + 1
+                    val updatedLikedBy = post.likedBy + userId
+                    postRef.child("likes").setValue(updatedLikes)
+                    postRef.child("likedBy").setValue(updatedLikedBy)
+                    callback(true, "Like added successfully")
+                } else {
+                    callback(false, "Already liked")
+                }
+            } else {
+                callback(false, "Post not found")
+            }
+        }.addOnFailureListener { e ->
+            callback(false, e.message ?: "Failed to add like")
+        }
+    }
+
+    override fun addComment(postId: String, comment: String, userId: String, callback: (Boolean, String) -> Unit) {
+        val postRef = ref.child(postId)
+        postRef.get().addOnSuccessListener { snapshot ->
+            val post = snapshot.getValue(Post::class.java)
+            if (post != null) {
+                // You can extend this to store userId with the comment if you want
+                val updatedComments = post.comments + comment
+                val updatedCommentsCount = updatedComments.size
+                postRef.child("comments").setValue(updatedComments)
+                postRef.child("commentsCount").setValue(updatedCommentsCount)
+                callback(true, "Comment added successfully")
+            } else {
+                callback(false, "Post not found")
+            }
+        }.addOnFailureListener { e ->
+            callback(false, e.message ?: "Failed to add comment")
+        }
+    }
+
+    fun countComments(postId: String, callback: (Int?, String?) -> Unit) {
+        val postRef = ref.child(postId).child("commentsCount")
+        postRef.get().addOnSuccessListener { snapshot ->
+            val count = snapshot.getValue(Int::class.java)
+            callback(count, null)
+        }.addOnFailureListener { e ->
+            callback(null, e.message ?: "Failed to count comments")
+        }
     }
 }

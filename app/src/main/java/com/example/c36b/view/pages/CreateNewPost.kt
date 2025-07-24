@@ -204,9 +204,10 @@ Text(text = "Content", style = MaterialTheme.typography.labelMedium)
                     username = username,
                     time = System.currentTimeMillis().toString(),
                     content = content,
+                    title = title,
                     tags = tagList,
                     likes = 0,
-                    comments = 0,
+                    comments = emptyList(),
                     shares = 0,
                     imageUri = imageUri
                 )

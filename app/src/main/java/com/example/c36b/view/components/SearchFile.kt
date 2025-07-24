@@ -22,7 +22,7 @@ fun SearchBar() {
     OutlinedTextField(
         value = "",
         onValueChange = {},
-        placeholder = { Text("Search posts...") },
+        placeholder = { Text("Search User...") },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
         modifier = Modifier
             .fillMaxWidth()

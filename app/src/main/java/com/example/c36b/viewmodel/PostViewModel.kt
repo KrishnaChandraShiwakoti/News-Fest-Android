@@ -41,4 +41,20 @@ class PostViewModel(private val repo: PostRepository) : ViewModel() {
             onResult(false, "Upload not supported by this repository implementation.")
         }
     }
+
+    fun addLike(postId: String, userId: String, callback: (Boolean, String) -> Unit) {
+        if (repo is com.example.c36b.repository.PostRepositoryImpl) {
+            repo.addLike(postId, userId, callback)
+        } else {
+            callback(false, "Like not supported by this repository implementation.")
+        }
+    }
+    fun addComment(
+        postId: String,
+        comment: String,
+        userId: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        repo.addComment(postId, comment, userId, callback)
+    }
 }
