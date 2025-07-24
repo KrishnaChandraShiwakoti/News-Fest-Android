@@ -25,6 +25,7 @@ import com.example.c36b.view.LoginActivity
 fun SettingsScreen() {
     var isDarkMode by remember { mutableStateOf(false) }
     var logoutMessage by remember { mutableStateOf("") }
+    var deleteMessage by remember { mutableStateOf("") }
     val userRepo = UserRepositoryImpl()
     val context = LocalContext.current
     val activity = context as? Activity
@@ -65,9 +66,30 @@ fun SettingsScreen() {
 
             Spacer(modifier = Modifier.height(32.dp))
             // Add other settings options here
-            Button(onClick = { /* TODO: Implement account deletion */ }, modifier = Modifier.fillMaxWidth()) {
+            val firebaseUser = userRepo.getCurrentUser()
+            Button(onClick = {
+                val userId = firebaseUser?.uid
+                if (userId != null) {
+                    userRepo.deleteAccount(userId) { success, msg ->
+                        deleteMessage = msg
+                        if (success) {
+                            // Optionally log out and navigate to login
+                            val intent = Intent(context, LoginActivity::class.java)
+                            context.startActivity(intent)
+                            activity?.finish()
+                        }
+                    }
+                } else {
+                    deleteMessage = "User not found."
+                }
+            }, modifier = Modifier.fillMaxWidth()) {
                 Text("Delete Account")
             }
+            if (deleteMessage.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(deleteMessage, color = MaterialTheme.colorScheme.error)
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = { /* TODO: Implement notification settings */ }, modifier = Modifier.fillMaxWidth()) {
                 Text("Notification Settings")
