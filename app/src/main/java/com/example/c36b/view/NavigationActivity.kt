@@ -37,8 +37,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.c36b.view.pages.HomeScreen
 import com.example.c36b.view.pages.ProfileScreen
-import com.example.c36b.view.pages.SearchScreen
 import com.example.c36b.view.pages.BookmarkScreen
+import com.example.c36b.view.pages.EditPostScreen
 import com.example.c36b.R
 import com.example.c36b.model.Post
 import com.example.c36b.view.pages.CreateNewPost
@@ -61,7 +61,6 @@ fun NavigationBody() {
 
     val bottomNavItems = listOf(
         BottomNavItem("Home", Icons.Default.Home),
-        BottomNavItem("Search", Icons.Default.Search),
         BottomNavItem("create", Icons.Default.Create),
         BottomNavItem("Bookmark", Icons.Default.FavoriteBorder),
         BottomNavItem("Profile", Icons.Default.Person)
@@ -70,6 +69,7 @@ fun NavigationBody() {
     var selectedIndex by remember { mutableStateOf(0) }
     var userModel: com.example.c36b.model.UserModel? = null
     var selectedPostId by remember { mutableStateOf<String?>(null) }
+    var selectedPost by remember { mutableStateOf<com.example.c36b.model.Post?>(null) }
 
     Scaffold(
         bottomBar = {
@@ -93,10 +93,9 @@ fun NavigationBody() {
         ) {
             when (selectedIndex) {
                 0 -> HomeScreen()
-                1 -> SearchScreen()
-                2-> CreateNewPost()
-                3 -> BookmarkScreen()
-                4 -> {
+                1 -> CreateNewPost()
+                2 -> BookmarkScreen()
+                3 -> {
                     // Fetch user info from UserRepository and pass to ProfileScreen
                     val userRepo = com.example.c36b.repository.UserRepositoryImpl()
                     val firebaseUser = userRepo.getCurrentUser()
@@ -121,18 +120,14 @@ fun NavigationBody() {
                     when {
                         isLoading -> androidx.compose.material3.Text("Loading profile...")
                         error != null -> androidx.compose.material3.Text("Error: $error")
-                        userModel != null -> com.example.c36b.view.pages.ProfileScreen(
+                        userModel != null ->                         com.example.c36b.view.pages.ProfileScreen(
                             user = userModel!!,
-                            onEditProfile = { selectedIndex = 5 },
-                            onSettings = { selectedIndex = 6 },
+                            onEditProfile = { selectedIndex = 4 },
+                            onSettings = { selectedIndex = 5 },
                             onCreatePost = {},
                             onPostClick = { post ->
-                                if (!post.key.isNullOrEmpty()) {
-                                    selectedPostId = post.key
-                                    selectedIndex = 7
-                                } else {
-                                    selectedPostId = null
-                                }
+                                selectedPost = post
+                                selectedIndex = 7
                             }
                         )
                     }
@@ -140,13 +135,13 @@ fun NavigationBody() {
             }
         }
         // Add navigation for EditProfileScreen and SettingsScreen
-        if (selectedIndex == 5 && userModel != null) {
+        if (selectedIndex == 4 && userModel != null) {
             com.example.c36b.view.pages.EditProfileScreen(userModel!!)
         }
-        if (selectedIndex == 6) {
+        if (selectedIndex == 5) {
             com.example.c36b.view.pages.SettingsScreen()
         }
-        if (selectedIndex == 7) {
+        if (selectedIndex == 6) {
             if (selectedPostId.isNullOrEmpty()) {
                 Text("No post selected or invalid post.")
             } else {
@@ -171,6 +166,18 @@ fun NavigationBody() {
                     post != null -> com.example.c36b.view.pages.PostScreen(post!!, onLike = {}, onComment = {})
                     else -> Text("Post not found.")
                 }
+            }
+        }
+        if (selectedIndex == 7) {
+            if (selectedPost != null) {
+                com.example.c36b.view.pages.EditPostScreen(
+                    post = selectedPost!!,
+                    onBack = { selectedIndex = 3 }, // Go back to profile
+                    onPostUpdated = { selectedIndex = 3 }, // Go back to profile after update
+                    onPostDeleted = { selectedIndex = 3 } // Go back to profile after delete
+                )
+            } else {
+                Text("No post selected for editing.")
             }
         }
     }

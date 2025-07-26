@@ -22,10 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.c36b.R
 import com.example.c36b.view.components.PostCard
-import com.example.c36b.view.components.SearchBar
 import androidx.compose.foundation.lazy.items
 import com.example.c36b.model.Post
 import androidx.compose.runtime.LaunchedEffect
+import com.example.c36b.viewmodel.BookmarkViewModel
 
 @Composable
 fun HomeScreen() {
@@ -36,16 +36,30 @@ fun HomeScreen() {
             return com.example.c36b.viewmodel.PostViewModel(com.example.c36b.repository.PostRepositoryImpl()) as T
         }
     })
+    val bookmarkViewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+            return BookmarkViewModel(com.example.c36b.repository.BookmarkRepositoryImpl()) as T
+        }
+    })
     var posts by remember { mutableStateOf<List<com.example.c36b.model.Post>>(emptyList()) }
+    var bookmarkedPostIds by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var showComments by remember { mutableStateOf<Post?>(null) }
+    val currentUserId = com.example.c36b.repository.UserRepositoryImpl().getCurrentUser()?.uid ?: ""
 
     LaunchedEffect(Unit) {
+        // First, get all posts
         postViewModel.getAllPosts { result, err ->
             if (result != null) {
                 posts = result
-                isLoading = false
+                // Then get bookmarked post IDs
+                bookmarkViewModel.getBookmarkedPosts(currentUserId) { success, bookmarkedIds, message ->
+                    if (success) {
+                        bookmarkedPostIds = bookmarkedIds
+                    }
+                    isLoading = false
+                }
             } else {
                 error = err
                 isLoading = false
@@ -83,6 +97,8 @@ fun HomeScreen() {
                         val currentUserId = com.example.c36b.repository.UserRepositoryImpl().getCurrentUser()?.uid ?: ""
                         var liked by remember { mutableStateOf(post.likedBy.contains(currentUserId)) }
                         var likeCount by remember { mutableStateOf(post.likes) }
+                        val isBookmarked = post.key != null && bookmarkedPostIds.contains(post.key)
+                        
                         PostCard(
                             post = post.copy(likes = likeCount),
                             onLike = {
@@ -99,7 +115,35 @@ fun HomeScreen() {
                                 }
                             },
                             onComment = { showComments = post },
-                            liked = liked
+                            liked = liked,
+                            onBookmark = {
+                                if (post.key != null) {
+                                    if (isBookmarked) {
+                                        // Remove bookmark
+                                        bookmarkViewModel.removeFromBookmark(
+                                            postId = post.key!!,
+                                            userId = currentUserId,
+                                            callback = { success, message ->
+                                                if (success) {
+                                                    bookmarkedPostIds = bookmarkedPostIds.filter { it != post.key }
+                                                }
+                                            }
+                                        )
+                                    } else {
+                                        // Add bookmark
+                                        bookmarkViewModel.addToBookmark(
+                                            postId = post.key!!,
+                                            userId = currentUserId,
+                                            callback = { success, message ->
+                                                if (success) {
+                                                    bookmarkedPostIds = bookmarkedPostIds + post.key!!
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            },
+                            isBookmarked = isBookmarked
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
