@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+//import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
+//import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,22 +42,36 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.c36b.R
 
 @Composable
-fun PostCard(post: Post, onLike: (Post) -> Unit, onComment: (Post) -> Unit, liked: Boolean = false) {
+fun PostCard(
+    post: Post, 
+    onLike: (Post) -> Unit, 
+    onComment: (Post) -> Unit, 
+    liked: Boolean = false,
+    onBookmark: (Post) -> Unit,
+    isBookmarked: Boolean = false
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column (modifier = Modifier.padding(12.dp)) {
-            Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                 Row (verticalAlignment = Alignment.CenterVertically){
-                Icon(Icons.Default.Person, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(text = post.username, fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Person, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(text = post.username, fontWeight = FontWeight.Bold)
+                    }
                 }
-                }
-                Image(painter = painterResource(R.drawable.baseline_bookmark_24),contentDescription = null)
+                Icon(
+                    if (isBookmarked) painterResource(R.drawable.outline_bookmark_added_24) else painterResource(id = R.drawable.baseline_bookmark_24),
+                    contentDescription = "Bookmark",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onBookmark(post) },
+                    tint = if (isBookmarked) Color.Blue else Color.Gray
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(post.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
