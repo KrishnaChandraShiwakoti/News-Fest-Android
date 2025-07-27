@@ -22,6 +22,14 @@ class PostViewModel(private val repo: PostRepository) : ViewModel() {
         repo.updatePost(postId, post, callback)
     }
 
+    fun updatePostWithImage(context: android.content.Context, postId: String, post: Post, callback: (Boolean, String) -> Unit) {
+        if (repo is com.example.c36b.repository.PostRepositoryImpl) {
+            repo.updatePostWithImage(context, postId, post, callback)
+        } else {
+            callback(false, "Update with image not supported by this repository implementation.")
+        }
+    }
+
     fun deletePost(postId: String, callback: (Boolean, String) -> Unit) {
         repo.deletePost(postId, callback)
     }

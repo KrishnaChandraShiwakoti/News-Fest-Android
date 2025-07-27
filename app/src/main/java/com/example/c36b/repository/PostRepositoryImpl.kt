@@ -79,7 +79,7 @@ class PostRepositoryImpl : PostRepository {
                 val snapshot = task.result
                 if (snapshot != null && snapshot.exists()) {
                     val post = snapshot.getValue(Post::class.java)
-                    callback(post, null)
+                    callback(post?.copy(key = postId), null)
                 } else {
                     callback(null, "Post not found")
                 }
@@ -139,8 +139,9 @@ class PostRepositoryImpl : PostRepository {
                 if (snapshot != null && snapshot.exists()) {
                     for (child in snapshot.children) {
                         val post = child.getValue(Post::class.java)
+                        val key = child.key
                         if (post != null) {
-                            posts.add(post)
+                            posts.add(post.copy(key = key))
                         }
                     }
                 }
@@ -159,8 +160,9 @@ class PostRepositoryImpl : PostRepository {
                 if (snapshot != null && snapshot.exists()) {
                     for (child in snapshot.children) {
                         val post = child.getValue(Post::class.java)
+                        val key = child.key
                         if (post != null && post.tags.contains(tag)) {
-                            posts.add(post)
+                            posts.add(post.copy(key = key))
                         }
                     }
                 }
