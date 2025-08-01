@@ -11,16 +11,7 @@ interface UserRepository {
 //      "message": "Email sent to ram@gmail,com",
 
     //    }
-    fun login(
-        email: String, password: String,
-        callback: (Boolean, String) -> Unit
-    )
 
-    //authentication ko function
-    fun register(
-        email: String, password: String,
-        callback: (Boolean, String, String) -> Unit
-    )
 
     //real time database ko function
     fun addUserToDatabase(

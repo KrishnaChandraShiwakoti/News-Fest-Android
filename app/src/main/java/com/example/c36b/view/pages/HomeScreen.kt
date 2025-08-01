@@ -102,13 +102,27 @@ fun HomeScreen() {
                         PostCard(
                             post = post.copy(likes = likeCount),
                             onLike = {
-                                if (!liked && post.key != null) {
-                                    liked = true
-                                    likeCount++
-                                    postViewModel.addLike(postId = post.key!!, userId = currentUserId) { success, _ ->
-                                        if (success) {
-                                            postViewModel.getAllPosts { result, err ->
-                                                if (result != null) posts = result
+                                if (post.key != null) {
+                                    if (!liked) {
+                                        // Add like
+                                        liked = true
+                                        likeCount++
+                                        postViewModel.addLike(postId = post.key!!, userId = currentUserId) { success, _ ->
+                                            if (success) {
+                                                postViewModel.getAllPosts { result, err ->
+                                                    if (result != null) posts = result
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // Remove like
+                                        liked = false
+                                        likeCount--
+                                        postViewModel.removeLike(postId = post.key!!, userId = currentUserId) { success, _ ->
+                                            if (success) {
+                                                postViewModel.getAllPosts { result, err ->
+                                                    if (result != null) posts = result
+                                                }
                                             }
                                         }
                                     }

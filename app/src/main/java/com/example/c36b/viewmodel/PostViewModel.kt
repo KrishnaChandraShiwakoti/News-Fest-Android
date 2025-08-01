@@ -57,6 +57,15 @@ class PostViewModel(private val repo: PostRepository) : ViewModel() {
             callback(false, "Like not supported by this repository implementation.")
         }
     }
+
+    fun removeLike(postId: String, userId: String, callback: (Boolean, String) -> Unit) {
+        if (repo is com.example.c36b.repository.PostRepositoryImpl) {
+            repo.removeLike(postId, userId, callback)
+        } else {
+            callback(false, "Remove like not supported by this repository implementation.")
+        }
+    }
+
     fun addComment(
         postId: String,
         comment: String,

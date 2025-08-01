@@ -248,6 +248,28 @@ class PostRepositoryImpl : PostRepository {
         }
     }
 
+    override fun removeLike(postId: String, userId: String, callback: (Boolean, String) -> Unit) {
+        val postRef = ref.child(postId)
+        postRef.get().addOnSuccessListener { snapshot ->
+            val post = snapshot.getValue(Post::class.java)
+            if (post != null) {
+                if (post.likedBy.contains(userId)) {
+                    val updatedLikes = post.likes - 1
+                    val updatedLikedBy = post.likedBy.filter { it != userId }
+                    postRef.child("likes").setValue(updatedLikes)
+                    postRef.child("likedBy").setValue(updatedLikedBy)
+                    callback(true, "Like removed successfully")
+                } else {
+                    callback(false, "Post not liked by this user")
+                }
+            } else {
+                callback(false, "Post not found")
+            }
+        }.addOnFailureListener { e ->
+            callback(false, e.message ?: "Failed to remove like")
+        }
+    }
+
     override fun addComment(postId: String, comment: String, userId: String, callback: (Boolean, String) -> Unit) {
         val postRef = ref.child(postId)
         postRef.get().addOnSuccessListener { snapshot ->

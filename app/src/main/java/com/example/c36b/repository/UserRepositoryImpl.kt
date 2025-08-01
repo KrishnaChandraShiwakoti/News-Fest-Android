@@ -1,6 +1,7 @@
 package com.example.c36b.repository
 
 import com.example.c36b.model.UserModel
+import com.example.c36b.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -18,43 +19,6 @@ class UserRepositoryImpl : UserRepository {
 
     val ref: DatabaseReference = database.reference.child("users")
 
-    override fun login(
-        email: String,
-        password: String,
-        callback: (Boolean, String) -> Unit
-    ) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { res ->
-                if (res.isSuccessful) {
-                    callback(true, "Login successfully")
-                } else {
-                    callback(false, "${res.exception?.message}")
-                }
-
-            }
-    }
-
-    override fun register(
-        email: String,
-        password: String,
-        callback: (Boolean, String, String) -> Unit
-    ) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { res ->
-                if (res.isSuccessful) {
-                    callback(
-                        true, "Registration successfull",
-                        "${auth.currentUser?.uid}"
-                    )
-                } else {
-                    callback(
-                        false,
-                        "${res.exception?.message}", ""
-                    )
-                }
-
-            }
-    }
 
     override fun addUserToDatabase(
         userId: String,
@@ -139,13 +103,83 @@ class UserRepositoryImpl : UserRepository {
         userId: String,
         callback: (Boolean, String) -> Unit
     ) {
-        ref.child(userId).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) {
-                callback(true, "Account deleted successfully")
-            } else {
-                callback(true, "${it.exception?.message}")
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            callback(false, "No user is currently signed in")
+            return
+        }
 
+        // First, get user data to find username for cleaning up posts
+        ref.child(userId).get().addOnSuccessListener { snapshot ->
+            val userModel = snapshot.getValue(UserModel::class.java)
+            val username = userModel?.name ?: ""
+
+            // Clean up user's posts and likes
+            cleanupUserData(userId, username) { cleanupSuccess ->
+                if (cleanupSuccess) {
+                    // Delete user data from Realtime Database
+                    ref.child(userId).removeValue().addOnCompleteListener { databaseTask ->
+                        if (databaseTask.isSuccessful) {
+                            // Then delete the user from Firebase Authentication
+                            currentUser.delete().addOnCompleteListener { authTask ->
+                                if (authTask.isSuccessful) {
+                                    callback(true, "Account deleted successfully from both database and authentication")
+                                } else {
+                                    // If auth deletion fails, we should still report the database deletion
+                                    callback(false, "Database deleted but authentication deletion failed: ${authTask.exception?.message}")
+                                }
+                            }
+                        } else {
+                            callback(false, "Failed to delete from database: ${databaseTask.exception?.message}")
+                        }
+                    }
+                } else {
+                    callback(false, "Failed to cleanup user data")
+                }
             }
+        }.addOnFailureListener { e ->
+            callback(false, "Failed to get user data: ${e.message}")
+        }
+    }
+
+    private fun cleanupUserData(userId: String, username: String, callback: (Boolean) -> Unit) {
+        val postsRef = database.reference.child("posts")
+        
+        // Remove all posts by this user
+        postsRef.orderByChild("username").equalTo(username).get().addOnSuccessListener { snapshot ->
+            val deleteTasks = mutableListOf<com.google.android.gms.tasks.Task<Void>>()
+            
+            for (postSnapshot in snapshot.children) {
+                deleteTasks.add(postSnapshot.ref.removeValue())
+            }
+            
+            // Remove user from likedBy lists in all posts
+            postsRef.get().addOnSuccessListener { allPostsSnapshot ->
+                val updateTasks = mutableListOf<com.google.android.gms.tasks.Task<Void>>()
+                
+                for (postSnapshot in allPostsSnapshot.children) {
+                    val post = postSnapshot.getValue(Post::class.java)
+                    if (post != null && post.likedBy.contains(userId)) {
+                        val updatedLikedBy = post.likedBy.filter { it != userId }
+                        val updatedLikes = post.likes - 1
+                        updateTasks.add(postSnapshot.ref.child("likedBy").setValue(updatedLikedBy))
+                        updateTasks.add(postSnapshot.ref.child("likes").setValue(updatedLikes))
+                    }
+                }
+                
+                // Execute all cleanup tasks
+                com.google.android.gms.tasks.Tasks.whenAll(deleteTasks + updateTasks)
+                    .addOnSuccessListener {
+                        callback(true)
+                    }
+                    .addOnFailureListener {
+                        callback(false)
+                    }
+            }.addOnFailureListener {
+                callback(false)
+            }
+        }.addOnFailureListener {
+            callback(false)
         }
     }
 

@@ -11,6 +11,7 @@ interface PostRepository {
     fun getPostsByUser(username: String, callback: (List<Post>?, String?) -> Unit)
     fun getPostsByTag(tag: String, callback: (List<Post>?, String?) -> Unit)
     fun addLike(postId: String, userId: String, callback: (Boolean, String) -> Unit)
+    fun removeLike(postId: String, userId: String, callback: (Boolean, String) -> Unit)
     fun addComment(postId: String, comment: String, userId: String, callback: (Boolean, String) -> Unit)
 
 }
