@@ -4,17 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.c36b.model.UserModel
+import com.example.c36b.repository.UserAuthRepository
 import com.example.c36b.repository.UserRepository
 import com.google.firebase.auth.FirebaseUser
 
-class UserViewModel(val repo : UserRepository) : ViewModel(){
+class UserViewModel(val repo : UserRepository,val authRepo : UserAuthRepository) : ViewModel(){
 
 
     fun login(
         email: String, password: String,
         callback: (Boolean, String) -> Unit
     ){
-        repo.login(email,password,callback)
+        authRepo.login(email,password,callback)
     }
 
     //authentication ko function
@@ -22,7 +23,7 @@ class UserViewModel(val repo : UserRepository) : ViewModel(){
         email: String, password: String,
         callback: (Boolean, String, String) -> Unit
     ){
-        repo.register(email,password,callback)
+        authRepo.register(email,password,callback)
     }
 
     //real time database ko function

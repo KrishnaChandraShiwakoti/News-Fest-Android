@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +54,7 @@ import com.example.c36b.repository.UserRepositoryImpl
 import com.example.c36b.ui.theme.C36BTheme
 import com.example.c36b.viewmodel.UserViewModel
 import com.example.c36b.R
+import com.example.c36b.repository.UserAuthRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -70,7 +72,8 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun loginBody(){
     val repo = remember { UserRepositoryImpl() }
-    val userViewModel = remember { UserViewModel(repo) }
+    val authRepo = remember { UserAuthRepositoryImpl(FirebaseAuth.getInstance()) }
+    val userViewModel = remember { UserViewModel(repo,authRepo) }
     val context = LocalContext.current
     val activity = context as? Activity
     var email by remember { mutableStateOf("") }
@@ -118,7 +121,7 @@ fun loginBody(){
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 10.dp),
+                            .padding(horizontal = 10.dp).testTag("email"),
                         textStyle = TextStyle(color = Color.White),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White,
@@ -143,7 +146,7 @@ fun loginBody(){
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 10.dp),
+                            .padding(horizontal = 10.dp).testTag("password"),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White,
                             unfocusedPlaceholderColor = Color.White,
@@ -187,7 +190,7 @@ fun loginBody(){
                                     }
                                 }
                         },
-                        modifier = Modifier.height(50.dp).width(200.dp),
+                        modifier = Modifier.height(50.dp).width(200.dp).testTag("submit"),
                         colors = if (isLoading) ButtonDefaults.buttonColors(containerColor = Color.Gray, contentColor = Color.White)
                                  else ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.Black)
                     ) {

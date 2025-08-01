@@ -45,9 +45,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.c36b.model.UserModel
+import com.example.c36b.repository.UserAuthRepositoryImpl
 import com.example.c36b.repository.UserRepositoryImpl
 import com.example.c36b.ui.theme.C36BTheme
 import com.example.c36b.viewmodel.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +64,9 @@ class RegistrationActivity : ComponentActivity() {
 @Composable
 fun registerBody() {
     val repo = remember { UserRepositoryImpl() }
-    val userViewModel = remember { UserViewModel(repo) }
+    val authRepo = remember { UserAuthRepositoryImpl(FirebaseAuth.getInstance()) }
+
+    val userViewModel = remember { UserViewModel(repo,authRepo) }
     val context = LocalContext.current
     val activity = context as? Activity
     var email by remember { mutableStateOf("") }
